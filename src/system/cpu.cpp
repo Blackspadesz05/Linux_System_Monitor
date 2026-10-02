@@ -35,6 +35,7 @@ void printCPUUsage() {
         return;
     }
 
+    cout<<"[Calculating CPU Usage...]\n";
     this_thread::sleep_for(chrono::seconds(1));
     vector<pair<ll, ll>> end = getCPUStats();
     if(end.size() != start.size()) {

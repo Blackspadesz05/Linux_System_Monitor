@@ -1,3 +1,3 @@
 #pragma once
 
-void runSystemCommand();
+void runSystemCommand(bool watch = false, int refresh = 10);

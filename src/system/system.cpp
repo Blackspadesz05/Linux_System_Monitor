@@ -3,8 +3,10 @@
 #include "system.h"
 
 #include <bits/stdc++.h>
+#include <chrono>
 #include <sys/statvfs.h>
 #include <sys/utsname.h>
+#include <thread>
 #include <unistd.h>
 
 using namespace std;
@@ -81,15 +83,33 @@ void printDisk() {
     cout<<"Disk Usage: "<<usage<<"%\n";
 }
 
-void runSystemCommand() {
+void clearScreen() {
+    cout<<"\033[2J\033[H";
+}
+
+void allSystemInfo(){
     cout<<"SYSTEM: \n";
     printSystemInfo();
     printUptime();
     printLoadAverage();
 
     cout<<"\nRESOURCES: \n";
-    printCPUUsage();
     printMemory();
     printDisk();
     printNetworkTraffic();
+    printCPUUsage();
+}
+
+void runSystemCommand(bool watch, int refresh) {
+    if(!watch){
+        allSystemInfo();
+        return;
+    }
+
+    while(true){
+        clearScreen();
+        allSystemInfo();
+        cout<<"\nPress Ctrl+C to exit watch mode.\n";
+        this_thread::sleep_for(chrono::seconds(refresh));
+    }
 }
