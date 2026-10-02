@@ -1,6 +1,7 @@
 CXX = g++
 TARGET = sysmonitor
-SRC = src/main.cpp
+SRC = src/main.cpp \
+	  src/system/system.cpp
 
 all:
 	$(CXX) $(SRC) -o $(TARGET)
