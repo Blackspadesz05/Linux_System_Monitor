@@ -1,3 +1,4 @@
+#include "cpu.h"
 #include "system.h"
 
 #include <bits/stdc++.h>
@@ -75,7 +76,7 @@ void printDisk() {
     ll total = (ll)(stats.f_blocks) * stats.f_frsize;
     ll available = (ll)(stats.f_bavail) * stats.f_frsize;
     ll used = total - available;
-    double usage = 100.0 * (double)used/total;
+    double usage = (100.0 * used)/total;
     cout<<"Disk Usage: "<<usage<<"%\n";
 }
 
@@ -86,6 +87,7 @@ void runSystemCommand() {
     printLoadAverage();
 
     cout<<"\nRESOURCES: \n";
+    printCPUUsage();
     printMemory();
     printDisk();
 }
