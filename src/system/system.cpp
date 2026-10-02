@@ -1,4 +1,5 @@
 #include "cpu.h"
+#include "network.h"
 #include "system.h"
 
 #include <bits/stdc++.h>
@@ -90,4 +91,5 @@ void runSystemCommand() {
     printCPUUsage();
     printMemory();
     printDisk();
+    printNetworkTraffic();
 }
