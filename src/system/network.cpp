@@ -1,5 +1,5 @@
 #include "network.h"
-#include "util.h"
+#include "../util.h"
 
 #include <bits/stdc++.h>
 

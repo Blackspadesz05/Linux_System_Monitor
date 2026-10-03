@@ -1,7 +1,7 @@
 #include "cpu.h"
 #include "network.h"
 #include "system.h"
-#include "util.h"
+#include "../util.h"
 
 #include <bits/stdc++.h>
 #include <chrono>

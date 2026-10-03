@@ -1,17 +1,19 @@
 #include <bits/stdc++.h>
 #include "system/system.h"
+#include "process/process.h"
 
 using namespace std;
 
 void printHelp() {
     cout << "Linux System Monitor\n\n"
          << "Usage:\n"
-         << "  sysguard <command>\n\n"
+         << "  sysmonitor <command>\n\n"
          << "Commands:\n"
          << "  system               Show system information\n"
          << "  system --watch       Continuously monitor the system\n"
          << "  system --watch --refresh N \n"
          << "                       Refresh every N seconds\n"
+         << "  process              Show running processes\n"
          << "  help                 Show this help message\n";
 }
 
@@ -53,6 +55,14 @@ int main(int argc, char* argv[]) {
             return 1;
         }
         runSystemCommand(watch, refresh);
+        return 0;
+    }
+    if(command == "process") {
+        if(argc > 2) {
+            cout << "Process command does not support options yet\n";
+            return 1;
+        }
+        runProcessCommand();
         return 0;
     }
 
