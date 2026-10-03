@@ -1,23 +1,11 @@
 #include "network.h"
+#include "util.h"
 
 #include <bits/stdc++.h>
 
 using namespace std;
 
 #define ll long long
-
-string formatBytes(ll val) {
-    vector<string> units{"B","KB","MB","GB"};
-    ll idx = 0;
-    while(idx < units.size() - 1){
-        if(val >= 1024){
-            val/=1024;
-            idx++;
-        }
-        else break;
-    }
-    return to_string(val) +" "+ units[idx];
-}
 
 void printNetworkTraffic() {
     ifstream file("/proc/net/dev");
@@ -31,6 +19,10 @@ void printNetworkTraffic() {
     while(getline(file, line)) {
         size_t pos = line.find(':');
         if(pos == string::npos) continue;
+        string interface = line.substr(0, pos);
+        while(!interface.empty() && interface[0] == ' ')
+            interface.erase(interface.begin());
+
         string data = line.substr(pos + 1);
         stringstream ss(data);
         ll rx, tx, temp;
@@ -39,7 +31,8 @@ void printNetworkTraffic() {
         ss >> tx;
         totalRX += rx;
         totalTX += tx;
+        cout<<"Network "<<interface<<" RX: "<<formatBytes(rx)<<" TX: "<<formatBytes(tx)<<"\n";
     }
-    cout<<"Network RX: "<<formatBytes(totalRX)<<"\n";
-    cout<<"Network TX: "<<formatBytes(totalTX)<<"\n";
+    cout<<"Network Total RX: "<<formatBytes(totalRX)<<"\n";
+    cout<<"Network Total TX: "<<formatBytes(totalTX)<<"\n";
 }

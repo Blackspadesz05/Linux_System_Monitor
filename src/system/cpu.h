@@ -1,3 +1,3 @@
 #pragma once
 
-void printCPUUsage();
+void printCPUUsage(int sampleTime = 1);

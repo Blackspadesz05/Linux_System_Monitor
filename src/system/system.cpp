@@ -1,6 +1,7 @@
 #include "cpu.h"
 #include "network.h"
 #include "system.h"
+#include "util.h"
 
 #include <bits/stdc++.h>
 #include <chrono>
@@ -11,7 +12,7 @@
 
 using namespace std;
 
-using ll = long long;
+#define ll long long
 
 string getHostname() {
     char hostname[64];
@@ -70,6 +71,26 @@ void printMemory() {
     cout<<"Memory: "<<(used/1024)<<" MB / "<<(total/1024)<<" MB\n";
 }
 
+void printSwap() {
+    ifstream file("/proc/meminfo");
+    string key, unit;
+    ll value, total = 0, free = 0;
+
+    while(file >> key >> value >> unit) {
+        if(key == "SwapTotal:")
+            total = value;
+        else if(key == "SwapFree:")
+            free = value;
+    }
+    if(total == 0) {
+        cout<<"Swap: unavailable\n";
+        return;
+    }
+
+    ll used = total - free;
+    cout<<"Swap: "<<used/1024<<" MB / "<<total/1024<<" MB\n";
+}
+
 void printDisk() {
     struct statvfs stats;
     if(statvfs("/", &stats) != 0) {
@@ -83,8 +104,38 @@ void printDisk() {
     cout<<"Disk Usage: "<<usage<<"%\n";
 }
 
+void printDiskIO() {
+    ifstream file("/proc/diskstats");
+    if(!file) {
+        cout<<"Disk I/O: unavailable\n";
+        return;
+    }
+
+    string line;
+    ll totalRead = 0, totalWrite = 0;
+    while(getline(file, line)) {
+        stringstream ss(line);
+        ll temp;
+        string device;
+        ss >> temp >> temp >> device;
+        string partitionPath = "/sys/class/block/" + device + "/partition";
+        ifstream partition(partitionPath);
+        if(partition) continue;
+
+        ll sectorsRead, sectorsWritten;
+        ss >> temp >> temp >> sectorsRead >> temp >> temp >> sectorsWritten;
+        totalRead += sectorsRead;
+        totalWrite += sectorsWritten;
+    }
+
+    totalRead *= 512;
+    totalWrite *= 512;
+    cout<<"Disk Read: "<<formatBytes(totalRead)<<"\n";
+    cout<<"Disk Write: "<<formatBytes(totalWrite)<<"\n";
+}
+
 void clearScreen() {
-    cout<<"\033[2J\033[H";
+    cout<<"\033[2J\033[3J\033[H";
 }
 
 void allSystemInfo(){
@@ -95,6 +146,7 @@ void allSystemInfo(){
 
     cout<<"\nRESOURCES: \n";
     printMemory();
+    printSwap();
     printDisk();
     printNetworkTraffic();
     printCPUUsage();
@@ -110,6 +162,7 @@ void runSystemCommand(bool watch, int refresh) {
         clearScreen();
         allSystemInfo();
         cout<<"\nPress Ctrl+C to exit watch mode.\n";
-        this_thread::sleep_for(chrono::seconds(refresh));
+        if(refresh>1)
+            this_thread::sleep_for(chrono::seconds(refresh - 1));
     }
 }

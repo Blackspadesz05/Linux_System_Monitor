@@ -28,7 +28,7 @@ vector<pair<ll, ll>> getCPUStats() {
     return stats;
 }
 
-void printCPUUsage() {
+void printCPUUsage(int sampleTime) {
     vector<pair<ll, ll>> start = getCPUStats();
     if(start.empty()) {
         cout << "CPU Usage: unavailable\n";
@@ -36,7 +36,7 @@ void printCPUUsage() {
     }
 
     cout<<"[Calculating CPU Usage...]\n";
-    this_thread::sleep_for(chrono::seconds(1));
+    this_thread::sleep_for(chrono::seconds(sampleTime));
     vector<pair<ll, ll>> end = getCPUStats();
     if(end.size() != start.size()) {
         cout << "CPU Usage: unavailable\n";
