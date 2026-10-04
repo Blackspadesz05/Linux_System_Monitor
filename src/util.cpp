@@ -18,3 +18,7 @@ string formatBytes(ll val) {
     }
     return to_string(val) +" "+ units[idx];
 }
+
+void clearScreen() {
+    cout<<"\033[2J\033[3J\033[H";
+}

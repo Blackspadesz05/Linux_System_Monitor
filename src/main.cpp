@@ -19,6 +19,9 @@ void printHelp() {
          << "  process --sort memory    Sort by memory usage\n"
          << "  process --top N          Show top N processes\n"
          << "  process --name NAME      Filter by process name\n"
+         << "  process --watch               Continuously monitor processes\n"
+         << "  process --watch --refresh N \n"
+         << "                           Refresh every N seconds\n"
          << "  help                     Show this help message\n";
 }
 
@@ -63,9 +66,9 @@ int main(int argc, char* argv[]) {
         return 0;
     }
     if(command == "process") {
-        string sortBy = "pid";
-        int topN = 1000000;
-        string nameFilter = "";
+        string sortBy = "pid", nameFilter = "";
+        int topN = 1000000, refresh = 10;
+        bool watch = false;
         for(int i = 2; i < argc; i++) {
             string option = argv[i];
             if(option == "--sort") {
@@ -97,12 +100,30 @@ int main(int argc, char* argv[]) {
                 }
                 nameFilter = argv[++i];
             }
+            else if(option == "--watch") {
+                watch = true;
+            }
+            else if(option == "--refresh") {
+                if(i + 1 >= argc) {
+                    cout<<"Missing value for --refresh\n";
+                    return 1;
+                }
+                refresh = stoi(argv[++i]);
+                if(refresh <= 0) {
+                    cout<<"Refresh interval must be positive\n";
+                    return 1;
+                }
+            }
             else {
                 cout<<"Unknown process option: "<<option<<'\n';
                 return 1;
             }
         }
-        runProcessCommand(sortBy, topN, nameFilter);
+        if(!watch && refresh != 10) {
+            cout<<"--refresh can only be used with --watch\n";
+            return 1;
+        }
+        runProcessCommand(sortBy, topN, nameFilter, watch, refresh);
         return 0;
     }
 

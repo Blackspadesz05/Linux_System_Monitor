@@ -4,4 +4,4 @@
 
 using namespace std;
 
-void runProcessCommand(string sortBy, int topN, string nameFilter);
+void runProcessCommand(string sortBy, int topN, string nameFilter, bool watch, int refresh);

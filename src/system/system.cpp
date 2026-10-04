@@ -134,10 +134,6 @@ void printDiskIO() {
     cout<<"Disk Write: "<<formatBytes(totalWrite)<<"\n";
 }
 
-void clearScreen() {
-    cout<<"\033[2J\033[3J\033[H";
-}
-
 void allSystemInfo(){
     cout<<"SYSTEM: \n";
     printSystemInfo();

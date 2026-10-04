@@ -194,12 +194,29 @@ void printProcessTable(vector<ProcessInfo> processes, string sortBy, int topN, s
     cout<<"Total processes: "<<processes.size()<<'\n';
 }
 
-void runProcessCommand(string sortBy, int topN, string nameFilter) {
-    vector<ProcessInfo> processes = getProcesses();
-    calculateCPUUsage(processes);
-    if(processes.empty()) {
-        cout<<"Unable to retrieve process information.\n";
+void runProcessCommand(string sortBy, int topN, string nameFilter, bool watch, int refresh) {
+    if(!watch){
+        vector<ProcessInfo> processes = getProcesses();
+        calculateCPUUsage(processes);
+        if(processes.empty()) {
+            cout<<"Unable to retrieve process information.\n";
+            return;
+        }
+        printProcessTable(processes, sortBy, topN, nameFilter);
         return;
     }
-    printProcessTable(processes, sortBy, topN, nameFilter);
+
+    while(true){
+        clearScreen();
+        vector<ProcessInfo> processes = getProcesses();
+        calculateCPUUsage(processes);
+        if(processes.empty()) {
+            cout<<"Unable to retrieve process information.\n";
+            return;
+        }
+        printProcessTable(processes, sortBy, topN, nameFilter);
+        cout<<"\nPress Ctrl+C to exit watch mode.\n";
+        if(refresh > 1)
+            this_thread::sleep_for(chrono::seconds(refresh-1));
+    }
 }
