@@ -1,3 +1,7 @@
 #pragma once
 
-void runProcessCommand();
+#include <string>
+
+using namespace std;
+
+void runProcessCommand(string sortBy, int topN, string nameFilter);

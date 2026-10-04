@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+
 #include "system/system.h"
 #include "process/process.h"
 
@@ -9,12 +10,16 @@ void printHelp() {
          << "Usage:\n"
          << "  sysmonitor <command>\n\n"
          << "Commands:\n"
-         << "  system               Show system information\n"
-         << "  system --watch       Continuously monitor the system\n"
+         << "  system                   Show system information\n"
+         << "  system --watch           Continuously monitor the system\n"
          << "  system --watch --refresh N \n"
-         << "                       Refresh every N seconds\n"
-         << "  process              Show running processes\n"
-         << "  help                 Show this help message\n";
+         << "                           Refresh every N seconds\n"
+         << "  process                  Show running processes\n"
+         << "  process --sort cpu       Sort by CPU usage\n"
+         << "  process --sort memory    Sort by memory usage\n"
+         << "  process --top N          Show top N processes\n"
+         << "  process --name NAME      Filter by process name\n"
+         << "  help                     Show this help message\n";
 }
 
 int main(int argc, char* argv[]) {
@@ -58,11 +63,46 @@ int main(int argc, char* argv[]) {
         return 0;
     }
     if(command == "process") {
-        if(argc > 2) {
-            cout << "Process command does not support options yet\n";
-            return 1;
+        string sortBy = "pid";
+        int topN = 1000000;
+        string nameFilter = "";
+        for(int i = 2; i < argc; i++) {
+            string option = argv[i];
+            if(option == "--sort") {
+                if(i + 1 >= argc) {
+                    cout<<"Missing value for --sort\n";
+                    return 1;
+                }
+                sortBy = argv[++i];
+                if(sortBy != "cpu" && sortBy != "memory" && sortBy != "pid") {
+                    cout<<"Invalid sort type: "<<sortBy<<"\nUse cpu, memory or pid\n";
+                    return 1;
+                }
+            }
+            else if(option == "--top") {
+                if(i + 1 >= argc) {
+                    cout<<"Missing value for --top\n";
+                    return 1;
+                }
+                topN = stoi(argv[++i]);
+                if(topN <= 0) {
+                    cout<<"Top N must be positive\n";
+                    return 1;
+                }
+            }
+            else if(option == "--name") {
+                if(i + 1 >= argc) {
+                    cout<<"Missing value for --name\n";
+                    return 1;
+                }
+                nameFilter = argv[++i];
+            }
+            else {
+                cout<<"Unknown process option: "<<option<<'\n';
+                return 1;
+            }
         }
-        runProcessCommand();
+        runProcessCommand(sortBy, topN, nameFilter);
         return 0;
     }
 
