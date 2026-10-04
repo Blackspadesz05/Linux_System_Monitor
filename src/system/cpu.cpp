@@ -28,11 +28,11 @@ vector<pair<ll, ll>> getCPUStats() {
     return stats;
 }
 
-void printCPUUsage(int sampleTime) {
+double printCPUUsage(int sampleTime) {
     vector<pair<ll, ll>> start = getCPUStats();
     if(start.empty()) {
         cout << "CPU Usage: unavailable\n";
-        return;
+        return -1;
     }
 
     cout<<"[Calculating CPU Usage...]\n";
@@ -40,14 +40,14 @@ void printCPUUsage(int sampleTime) {
     vector<pair<ll, ll>> end = getCPUStats();
     if(end.size() != start.size()) {
         cout << "CPU Usage: unavailable\n";
-        return;
+        return -1;
     }
 
     ll idleDiff = end[0].first - start[0].first;
     ll totalDiff = end[0].second - start[0].second;
     if(totalDiff <= 0) {
         cout << "CPU Usage: unavailable\n";
-        return;
+        return -1;
     }
 
     double usage = (100.0 * (totalDiff - idleDiff)) / totalDiff;
@@ -59,4 +59,5 @@ void printCPUUsage(int sampleTime) {
         double coreUsage = (100.0 * (coreTotalDiff - coreIdleDiff)) / coreTotalDiff;
         cout<<"\tCPU"<<i<<": "<<coreUsage<<"%\n";
     }
+    return usage;
 }

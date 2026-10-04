@@ -1,3 +1,12 @@
 #pragma once
 
-void runSystemCommand(bool watch = false, int refresh = 10);
+#include "alerts.h"
+
+struct ResourceValues {
+    double cpuUsage;
+    double memoryUsage;
+    double diskUsage;
+};
+ResourceValues allSystemInfo();
+
+void runSystemCommand(bool watch, int refresh, const AlertSettings &settings);

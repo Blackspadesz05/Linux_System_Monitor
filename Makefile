@@ -5,6 +5,7 @@ SRC = src/main.cpp \
 	  src/system/cpu.cpp \
 	  src/system/network.cpp \
       src/util.cpp \
+      src/system/alerts.cpp \
       src/process/process.cpp
 
 all:

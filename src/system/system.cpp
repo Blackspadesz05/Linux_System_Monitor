@@ -55,7 +55,7 @@ void printLoadAverage() {
     cout<<"Load Average : "<<one<<" "<<five<<" "<<fifteen<<'\n';
 }
 
-void printMemory() {
+double printMemory() {
     ifstream file("/proc/meminfo");
     string key, unit;
     ll value, total = 0, available = 0;
@@ -65,10 +65,12 @@ void printMemory() {
     }
     if(total == 0) {
         cout<<"Memory: unavailable\n";
-        return;
+        return -1;
     }
     ll used = total - available;
-    cout<<"Memory: "<<(used/1024)<<" MB / "<<(total/1024)<<" MB\n";
+    double usage = (100.0 * used) / total;
+    cout<<"Memory: "<<(used/1024)<<" MB / "<<(total/1024)<<" MB("<<usage<<"%)\n";
+    return usage;
 }
 
 void printSwap() {
@@ -91,17 +93,18 @@ void printSwap() {
     cout<<"Swap: "<<used/1024<<" MB / "<<total/1024<<" MB\n";
 }
 
-void printDisk() {
+double printDisk() {
     struct statvfs stats;
     if(statvfs("/", &stats) != 0) {
         cout<<"Disk Usage: unavailable\n";
-        return;
+        return -1;
     }
     ll total = (ll)(stats.f_blocks) * stats.f_frsize;
     ll available = (ll)(stats.f_bavail) * stats.f_frsize;
     ll used = total - available;
     double usage = (100.0 * used)/total;
     cout<<"Disk Usage: "<<usage<<"%\n";
+    return usage;
 }
 
 void printDiskIO() {
@@ -134,29 +137,37 @@ void printDiskIO() {
     cout<<"Disk Write: "<<formatBytes(totalWrite)<<"\n";
 }
 
-void allSystemInfo(){
+ResourceValues allSystemInfo(){
+    ResourceValues stats;
+    stats.cpuUsage = -1;
+    stats.memoryUsage = -1;
+    stats.diskUsage = -1;
+
     cout<<"SYSTEM: \n";
     printSystemInfo();
     printUptime();
     printLoadAverage();
 
     cout<<"\nRESOURCES: \n";
-    printMemory();
+    stats.memoryUsage = printMemory();
     printSwap();
-    printDisk();
+    stats.diskUsage = printDisk();
     printNetworkTraffic();
-    printCPUUsage();
+    stats.cpuUsage = printCPUUsage();
+    return stats;
 }
 
-void runSystemCommand(bool watch, int refresh) {
+void runSystemCommand(bool watch, int refresh, const AlertSettings &settings) {
     if(!watch){
-        allSystemInfo();
+        ResourceValues stats = allSystemInfo();
+        handleResourceLogging(stats, settings);
         return;
     }
 
     while(true){
         clearScreen();
-        allSystemInfo();
+        ResourceValues stats = allSystemInfo();
+        handleResourceLogging(stats, settings);
         cout<<"\nPress Ctrl+C to exit watch mode.\n";
         if(refresh>1)
             this_thread::sleep_for(chrono::seconds(refresh - 1));

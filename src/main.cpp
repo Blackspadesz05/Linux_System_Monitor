@@ -14,6 +14,10 @@ void printHelp() {
          << "  system --watch           Continuously monitor the system\n"
          << "  system --watch --refresh N \n"
          << "                           Refresh every N seconds\n"
+         << "  system --alert-cpu N     Alert when CPU exceeds N%\n"
+         << "  system --alert-memory N  Alert when memory exceeds N%\n"
+         << "  system --alert-disk N    Alert when disk exceeds N%\n"
+         << "  system --log FILE        Log resource information\n"
          << "  process                  Show running processes\n"
          << "  process --sort cpu       Sort by CPU usage\n"
          << "  process --sort memory    Sort by memory usage\n"
@@ -39,6 +43,8 @@ int main(int argc, char* argv[]) {
     if (command == "system") {
         bool watch = false;
         int refresh = 10;
+        AlertSettings settings;
+
         for(int i=2; i<argc; i++) {
             string option = argv[i];
             if(option == "--watch") watch = true;
@@ -53,6 +59,46 @@ int main(int argc, char* argv[]) {
                     return 1;
                 }
             }
+            else if(option == "--alert-cpu") {
+                if(i + 1 >= argc) {
+                    cout << "Missing value for --alert-cpu\n";
+                    return 1;
+                }
+                settings.cpuLimit = stod(argv[++i]);
+                if(settings.cpuLimit < 0 || settings.cpuLimit > 100) {
+                    cout << "CPU alert threshold must be between 0 and 100\n";
+                    return 1;
+                }
+            }
+            else if(option == "--alert-memory") {
+                if(i + 1 >= argc) {
+                    cout << "Missing value for --alert-memory\n";
+                    return 1;
+                }
+                settings.memoryLimit = stod(argv[++i]);
+                if(settings.memoryLimit < 0 || settings.memoryLimit > 100) {
+                    cout << "Memory alert threshold must be between 0 and 100\n";
+                    return 1;
+                }
+            }
+            else if(option == "--alert-disk") {
+                if(i + 1 >= argc) {
+                    cout << "Missing value for --alert-disk\n";
+                    return 1;
+                }
+                settings.diskLimit = stod(argv[++i]);
+                if(settings.diskLimit < 0 || settings.diskLimit > 100) {
+                    cout << "Disk alert threshold must be between 0 and 100\n";
+                    return 1;
+                }
+            }
+            else if(option == "--log") {
+                if(i + 1 >= argc) {
+                    cout << "Missing value for --log\n";
+                    return 1;
+                }
+                settings.logFile = argv[++i];
+            }
             else {
                 cout<<"Unknown option: "<<option<<"\n";
                 return 1;
@@ -62,7 +108,7 @@ int main(int argc, char* argv[]) {
             cout<<"--refresh can only be used with --watch\n";
             return 1;
         }
-        runSystemCommand(watch, refresh);
+        runSystemCommand(watch, refresh, settings);
         return 0;
     }
     if(command == "process") {
