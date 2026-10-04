@@ -1,5 +1,4 @@
 #include "cpu.h"
-#include "network.h"
 #include "system.h"
 #include "../util.h"
 
@@ -152,7 +151,6 @@ ResourceValues allSystemInfo(){
     stats.memoryUsage = printMemory();
     printSwap();
     stats.diskUsage = printDisk();
-    printNetworkTraffic();
     stats.cpuUsage = printCPUUsage();
     return stats;
 }

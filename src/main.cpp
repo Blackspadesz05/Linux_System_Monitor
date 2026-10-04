@@ -2,6 +2,7 @@
 
 #include "system/system.h"
 #include "process/process.h"
+#include "network/network.h"
 
 using namespace std;
 
@@ -25,6 +26,11 @@ void printHelp() {
          << "  process --name NAME      Filter by process name\n"
          << "  process --watch               Continuously monitor processes\n"
          << "  process --watch --refresh N \n"
+         << "                           Refresh every N seconds\n"
+         << "  network                  Show network traffic\n"
+         << "  network --interface NAME Monitor a specific interface\n"
+         << "  network --watch          Continuously monitor network\n"
+         << "  network --watch --refresh N\n"
          << "                           Refresh every N seconds\n"
          << "  help                     Show this help message\n";
 }
@@ -170,6 +176,45 @@ int main(int argc, char* argv[]) {
             return 1;
         }
         runProcessCommand(sortBy, topN, nameFilter, watch, refresh);
+        return 0;
+    }
+    if(command == "network") {
+        bool watch = false;
+        int refresh = 10;
+        string filter = "";
+        for(int i = 2; i < argc; i++) {
+            string option = argv[i];
+            if(option == "--watch") {
+                watch = true;
+            }
+            else if(option == "--refresh") {
+                if(i + 1 >= argc) {
+                    cout<<"Missing value for --refresh\n";
+                    return 1;
+                }
+                refresh = stoi(argv[++i]);
+                if(refresh <= 0) {
+                    cout<<"Refresh interval must be positive\n";
+                    return 1;
+                }
+            }
+            else if(option == "--interface") {
+                if(i + 1 >= argc) {
+                    cout<<"Missing value for --interface\n";
+                    return 1;
+                }
+                filter = argv[++i];
+            }
+            else {
+                cout<<"Unknown network option: "<<option<<'\n';
+                return 1;
+            }
+        }
+        if(!watch && refresh != 10) {
+            cout<<"--refresh can only be used with --watch\n";
+            return 1;
+        }
+        runNetworkCommand(watch, refresh, filter);
         return 0;
     }
 
